@@ -6,7 +6,7 @@ import Typography from "@/components/Typography";
 
 export default function Home() {
   return (
-    <div className="max-w-[1240px] w-full m-auto h-full px-4">
+    <div className="max-w-[1240px] w-full m-auto h-full px-4 pt-6">
       <Typography variant="headlineH4" className="mb-6">
         Hedge Fund Pool
       </Typography>

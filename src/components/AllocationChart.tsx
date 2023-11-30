@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { colors } from "../../tailwind.config";
 
 const AllocationChart = () => {
   const data = [
@@ -25,7 +26,7 @@ const AllocationChart = () => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Bar dataKey="allocation" fill="#8884d8" />
+        <Bar dataKey="allocation" fill={colors["primary-300"]} />
       </BarChart>
     </ResponsiveContainer>
   );

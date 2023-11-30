@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { colors } from "../../tailwind.config";
 
 const PerformanceChart = () => {
   const data = [
@@ -56,7 +57,7 @@ const PerformanceChart = () => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="price" stroke="#8884d8" />
+        <Line type="monotone" dataKey="price" stroke={colors["primary-500"]} />
       </LineChart>
     </ResponsiveContainer>
   );

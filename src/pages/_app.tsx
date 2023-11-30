@@ -14,7 +14,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <div className="flex min-h-screen w-full overflow-hidden">
           <div className="relative w-full flex-1 bg-light">
             <Topbar />
-            <main className="m-auto h-full w-full overflow-auto bg-grandient-main flex flex-col pt-[80px] pb-10">
+            <main className="m-auto h-full w-full overflow-auto bg-grandient-main flex flex-col pt-topbar pb-10">
               <Component {...pageProps} />
             </main>
           </div>
