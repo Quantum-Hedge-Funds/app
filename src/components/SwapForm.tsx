@@ -1,9 +1,12 @@
 import classNames from "classnames";
 import Typography from "./Typography";
-import { useAccount } from "wagmi";
+import { useAccount, useConnect } from "wagmi";
+import Button from "./Button";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const SwapForm = () => {
   const { address } = useAccount();
+  const { connect } = useConnect();
 
   return (
     <div className="shadow-card rounded-card bg-white w-full">
@@ -11,11 +14,13 @@ const SwapForm = () => {
       <TokenInput label="Buy" token="HDG" className="border-t" />
       <div className="p-6 border-t">
         {address ? (
-          <button className="rounded-full px-6 py-3 w-full bg-secondary-600 hover:bg-secondary-800 transition text-white">
-            Confirm
-          </button>
+          <Button>Confirm</Button>
         ) : (
-          <button>Connect Wallet</button>
+          <ConnectButton.Custom>
+            {({ openConnectModal }) => (
+              <Button onClick={() => openConnectModal()}>Connect Wallet</Button>
+            )}
+          </ConnectButton.Custom>
         )}
       </div>
     </div>
