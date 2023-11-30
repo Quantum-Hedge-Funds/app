@@ -3,8 +3,10 @@ import Card from "@/components/Card";
 import PerformanceChart from "@/components/PerformanceChart";
 import SwapForm from "@/components/SwapForm";
 import Typography from "@/components/Typography";
+import { useHydrated } from "@/hooks";
 
 export default function Home() {
+  const { hasHydrated } = useHydrated();
   return (
     <div className="max-w-[1240px] w-full m-auto h-full px-4 pt-6">
       <Typography variant="headlineH4" className="mb-6">
@@ -29,7 +31,7 @@ export default function Home() {
           </Card>
         </div>
         <div className="flex w-full flex-col">
-          <SwapForm />
+          {hasHydrated && <SwapForm />}
         </div>
       </div>
     </div>
