@@ -3,17 +3,17 @@ import type { Config } from "tailwindcss";
 import * as constants from "./src/styles/constants";
 
 export const colors = {
-  "primary-50": "#fef5fc",
-  "primary-100": "#fee9fc",
-  "primary-200": "#fbd3f6",
-  "primary-300": "#f7b0eb",
-  "primary-400": "#f181db",
-  "primary-500": "#e451c7",
-  "primary-600": "#c831a7",
-  "primary-700": "#a62588",
-  "primary-800": "#87216d",
-  "primary-900": "#6f2059",
-  "primary-950": "#490937",
+  "primary-50": "#eff8ff",
+  "primary-100": "#dff0ff",
+  "primary-200": "#b8e3ff",
+  "primary-300": "#78cdff",
+  "primary-400": "#38b6ff",
+  "primary-500": "#069af1",
+  "primary-600": "#007ace",
+  "primary-700": "#0061a7",
+  "primary-800": "#02528a",
+  "primary-900": "#084572",
+  "primary-950": "#062b4b",
 
   "secondary-50": "#f2effe",
   "secondary-100": "#e9e2fd",

@@ -9,7 +9,7 @@ const Topbar = () => {
       <div className="flex w-full justify-between gap-4 px-6 py-4 backdrop-blur-lg bg[hsla(240,7%,97%,.6)] bg-transparent">
         <div>
           <Image
-            src={"/qhf_font_logo.png"}
+            src={"/qhf_b_font_logo.png"}
             alt="logo"
             width={200}
             height={60}
