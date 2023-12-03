@@ -30,11 +30,16 @@ export const colors = {
   light: "#f7f7f8",
   dark: "#050505",
 
+  "light-toggle": "#f8e298",
+  "light-toggle-2": "#efb40d",
+  "dark-toggle": "#04182a",
+  "dark-toggle-2": "#0e98ee",
+
   "base-200": "#2d2d2d",
-  "base-300": "#1c1b20",
 };
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",

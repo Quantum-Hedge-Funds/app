@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -55,7 +55,11 @@ const PerformanceChart = () => {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="date" />
         <YAxis />
-        <Tooltip />
+        <Tooltip
+          labelStyle={{
+            color: "black",
+          }}
+        />
         <Legend />
         <Line type="monotone" dataKey="price" stroke={colors["primary-500"]} />
       </LineChart>

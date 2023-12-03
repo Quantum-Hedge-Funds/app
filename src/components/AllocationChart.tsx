@@ -23,8 +23,12 @@ const AllocationChart = () => {
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data}>
         <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
+        <YAxis domain={[0, 100]} />
+        <Tooltip
+          labelStyle={{
+            color: "black",
+          }}
+        />
         <Legend />
         <Bar dataKey="allocation" fill={colors["primary-300"]} />
       </BarChart>

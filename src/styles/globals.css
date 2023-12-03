@@ -46,3 +46,7 @@
 * {
   font-family: "Roboto";
 }
+
+body.dark {
+  background: black;
+}
