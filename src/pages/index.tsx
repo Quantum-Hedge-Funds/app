@@ -9,7 +9,7 @@ export default function Home() {
   const { hasHydrated } = useHydrated();
   return (
     <div className="max-w-[1240px] w-full m-auto h-full px-4 pt-6">
-      <Typography variant="headlineH4" className="mb-6">
+      <Typography variant="headlineH4" className="mb-6 dark:text-white">
         Hedge Fund Pool
       </Typography>
 
