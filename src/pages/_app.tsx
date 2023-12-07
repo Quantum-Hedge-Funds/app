@@ -6,6 +6,7 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { chains, wagmiConfig } from "@/lib/wallets";
 import { WagmiConfig } from "wagmi";
 import Topbar from "@/components/Topbar";
+import { Toaster } from "react-hot-toast";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -19,6 +20,13 @@ export default function App({ Component, pageProps }: AppProps) {
             </main>
           </div>
         </div>
+
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: { maxWidth: 425 },
+          }}
+        />
       </RainbowKitProvider>
     </WagmiConfig>
   );

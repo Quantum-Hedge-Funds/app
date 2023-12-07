@@ -13,23 +13,29 @@ import { useContractRead } from "wagmi";
 import vaultAbi from "../constants/vaultAbi.json";
 import Spinner from "./Spinner";
 import { fetchBalance } from "wagmi/actions";
+import { useHydrated } from "@/hooks";
 
 const AllocationChart = () => {
   const [allocations, setAllocations] = useState<
     { name: string; allocation: number }[]
   >([]);
 
-  const supportedTokens = useContractRead({
-    address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,
-    abi: vaultAbi,
-    functionName: "supportedTokens",
-  });
+  const { hasHydrated } = useHydrated();
+
+  // const supportedTokens = useContractRead({
+  //   address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,
+  //   abi: vaultAbi,
+  //   functionName: "supportedTokens",
+  // });
 
   const totalValue = useContractRead({
     address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,
     abi: vaultAbi,
     functionName: "calculateTotalValue",
   });
+
+  // console.log(supportedTokens.data);
+  // console.log(totalValue.data);
 
   const fetchAllocations = useCallback(async () => {
     // if (!supportedTokens?.data || totalValue.data) return;
@@ -63,7 +69,9 @@ const AllocationChart = () => {
     fetchAllocations();
   }, []);
 
-  const isLoading = totalValue.isLoading || supportedTokens.isLoading;
+  const isLoading = totalValue.isLoading;
+
+  if (!hasHydrated) return null;
 
   if (isLoading) {
     return (
