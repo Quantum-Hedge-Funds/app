@@ -72,3 +72,10 @@ export const getBalance = async (
   const contract = new Contract(tokenAddress, erc20ABI, signer);
   return contract.balanceOf(address);
 };
+
+export const getSupply = async (tokenAddress: string, signer: any) => {
+  if (!signer) return;
+
+  const contract = new Contract(tokenAddress, erc20ABI, signer);
+  return contract.totalSupply();
+};

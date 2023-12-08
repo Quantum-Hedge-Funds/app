@@ -11,6 +11,8 @@ import {
 import { colors } from "../../tailwind.config";
 import { useContractRead } from "wagmi";
 import vaultAbi from "../constants/vaultAbi.json";
+import fundManagerAbi from "../constants/fundManagerAbi.json";
+
 import Spinner from "./Spinner";
 import { fetchBalance } from "wagmi/actions";
 import { useHydrated } from "@/hooks";
@@ -22,11 +24,14 @@ const AllocationChart = () => {
 
   const { hasHydrated } = useHydrated();
 
-  // const supportedTokens = useContractRead({
-  //   address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,
-  //   abi: vaultAbi,
-  //   functionName: "supportedTokens",
-  // });
+  const totalWeights = useContractRead({
+    address: process.env
+      .NEXT_PUBLIC_FUND_MANAGER_CONTRACT_ADDRESS! as `0x${string}`,
+    abi: fundManagerAbi,
+    functionName: "totalWeights",
+  });
+
+  console.log(totalWeights.data);
 
   const totalValue = useContractRead({
     address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,

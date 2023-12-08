@@ -9,16 +9,25 @@ import { useDebounce } from "use-debounce";
 import Spinner from "./Spinner";
 import { stableToken, vaultShareToken } from "@/constants";
 import toast from "react-hot-toast";
-import { setTokenAllowance, useEthersSigner } from "@/utils/transactions";
+import {
+  getSupply,
+  setTokenAllowance,
+  useEthersSigner,
+} from "@/utils/transactions";
 import { BigNumber, Contract, utils } from "ethers";
 import { useGetBalance } from "@/hooks";
+import Card from "./Card";
 
 type SwapTypes = "deposit" | "withdraw";
 
 const SwapForm = () => {
   const [swapType, setSwapType] = useState<SwapTypes>("deposit");
   const [sellAmount, setSellAmount] = useState<string>("");
+
   const [buyAmount, setBuyAmount] = useState<string>("");
+  const [buyWithdrawAmount, setBuyWithdrawAmount] = useState<string>("");
+  const [positionValue, setPositionValue] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const { address = "" } = useAccount();
 
@@ -55,22 +64,26 @@ const SwapForm = () => {
     enabled: !!address,
   });
 
+  const { data: totalValue, refetch: refetchTotalValue } = useContractRead({
+    address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,
+    abi: vaultAbi,
+    functionName: "calculateTotalValue",
+  });
+
   const requiredAmount = BigInt(
     +(sellAmount || 0) *
       10 ** (swapType === "deposit" ? stableToken.decimals : 18)
   );
-
-  const withdraw = useContractWrite({
-    address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,
-    abi: vaultAbi,
-    functionName: "withdraw",
-  });
 
   const handleSellInputChange = (v: string) => {
     setSellAmount(v);
   };
 
   const handleBuyInputChange = (v: string) => {
+    if (swapType === "deposit") {
+      return setBuyWithdrawAmount(v);
+    }
+
     setBuyAmount(v);
   };
 
@@ -122,6 +135,7 @@ const SwapForm = () => {
 
       await stableBalance.refetch();
       await vaultShareBalance.refetch();
+      await refetchTotalValue();
 
       toast.success("Tokens deposited", { id: depositToastId });
     } catch (err) {
@@ -156,6 +170,7 @@ const SwapForm = () => {
 
       await stableBalance.refetch();
       await vaultShareBalance.refetch();
+      await refetchTotalValue();
 
       toast.success("Tokens withdrawn", { id: withdrawToastId });
     } catch (err) {
@@ -170,6 +185,7 @@ const SwapForm = () => {
   useEffect(() => {
     setSellAmount("");
     setBuyAmount("");
+    setBuyWithdrawAmount("");
   }, [swapType]);
 
   useEffect(() => {
@@ -180,72 +196,140 @@ const SwapForm = () => {
     }
   }, [buyValue]);
 
+  useEffect(() => {
+    (async () => {
+      const totalSupply = await getSupply(vaultShareToken.address, signer);
+
+      const totalV = Number(totalValue) || 1;
+      const totalS = Number(totalSupply) || 1;
+
+      if (+sellAmount > 0) {
+        const sell =
+          ((sellAmount || 0) as number) * 10 ** vaultShareToken.decimals;
+
+        const calculatedWithdrawAmount = (sell * totalV) / totalS;
+
+        setBuyWithdrawAmount(
+          utils.formatUnits(calculatedWithdrawAmount, stableToken.decimals)
+        );
+      } else {
+        setBuyWithdrawAmount("");
+      }
+
+      if (Number(vaultShareBalance?.balance || 0) == 0) {
+        return setPositionValue("");
+      }
+
+      const vaultB = Number(vaultShareBalance.balance || 0);
+
+      const calculatedPoitionValue = (vaultB * totalV) / totalS;
+
+      const totalPositionValue = utils.formatUnits(
+        calculatedPoitionValue,
+        stableToken.decimals
+      );
+
+      setPositionValue(totalPositionValue);
+    })();
+  }, [signer, sellAmount, totalValue, vaultShareBalance, stableBalance]);
+
   const hasAllowance = (allowance.data || BigInt(0)) >= requiredAmount;
 
-  const txLoading = withdraw.isLoading || isLoading || allowance.isLoading;
+  const txLoading = isLoading || allowance.isLoading;
 
   return (
-    <div className="shadow-card rounded-card bg-white dark:bg-primary-950 w-full">
-      <div className="rounded-full border flex justify-between dark:text-white m-6 overflow-hidden">
-        <TabButton
-          isActive={swapType === "deposit"}
-          onClick={() => setSwapType("deposit")}
-        >
-          Deposit
-        </TabButton>
-        <TabButton
-          isActive={swapType === "withdraw"}
-          onClick={() => setSwapType("withdraw")}
-        >
-          Withdraw
-        </TabButton>
+    <div className="flex gap-4 flex-col">
+      <div className="shadow-card rounded-card bg-white dark:bg-primary-950 w-full">
+        <div className="rounded-full border flex justify-between dark:text-white m-6 overflow-hidden">
+          <TabButton
+            isActive={swapType === "deposit"}
+            onClick={() => setSwapType("deposit")}
+          >
+            Deposit
+          </TabButton>
+          <TabButton
+            isActive={swapType === "withdraw"}
+            onClick={() => setSwapType("withdraw")}
+          >
+            Withdraw
+          </TabButton>
+        </div>
+
+        <TokenInput
+          label="Sell"
+          token={swapType === "deposit" ? stableToken : vaultShareToken}
+          balance={swapType === "deposit" ? stableBalance : vaultShareBalance}
+          value={sellAmount}
+          onChange={(e) => handleSellInputChange(e.target.value)}
+        />
+
+        <TokenInput
+          label="Buy"
+          token={swapType === "withdraw" ? stableToken : vaultShareToken}
+          balance={swapType === "withdraw" ? stableBalance : vaultShareBalance}
+          className="border-t"
+          value={swapType === "withdraw" ? buyWithdrawAmount : buyAmount}
+          isLoading={isFetchingSharesValue}
+          disabled={true}
+          onChange={(e) => handleBuyInputChange(e.target.value)}
+        />
+
+        <div className="p-6 border-t">
+          {address ? (
+            <>
+              {hasAllowance ? (
+                <Button
+                  onClick={
+                    swapType === "deposit" ? handleDeposit : handleWithdraw
+                  }
+                  isLoading={txLoading}
+                >
+                  Confirm
+                </Button>
+              ) : (
+                <Button onClick={handleApproveAllowance} isLoading={txLoading}>
+                  Approve token
+                </Button>
+              )}
+            </>
+          ) : (
+            <ConnectButton.Custom>
+              {({ openConnectModal }) => (
+                <Button onClick={() => openConnectModal()}>
+                  Connect Wallet
+                </Button>
+              )}
+            </ConnectButton.Custom>
+          )}
+        </div>
       </div>
 
-      <TokenInput
-        label="Sell"
-        token={swapType === "deposit" ? stableToken : vaultShareToken}
-        balance={swapType === "deposit" ? stableBalance : vaultShareBalance}
-        value={sellAmount}
-        onChange={(e) => handleSellInputChange(e.target.value)}
-      />
+      {(vaultShareBalance?.balance || 0) > 0 && (
+        <Card>
+          <Typography variant="headlineH6">Position</Typography>
+          <div className="mt-4 flex justify-between">
+            <div>
+              <Typography variant="headlineH5">
+                {utils.formatUnits(
+                  vaultShareBalance?.balance || 0,
+                  vaultShareToken?.decimals
+                )}{" "}
+                <span className="text-sm">VST</span>
+              </Typography>
+            </div>
 
-      <TokenInput
-        label="Buy"
-        token={swapType === "withdraw" ? stableToken : vaultShareToken}
-        balance={swapType === "withdraw" ? stableBalance : vaultShareBalance}
-        className="border-t"
-        value={buyAmount}
-        isLoading={isFetchingSharesValue}
-        disabled={true}
-        onChange={(e) => handleBuyInputChange(e.target.value)}
-      />
+            <div>
+              <Typography variant="headlineH6">=</Typography>
+            </div>
 
-      <div className="p-6 border-t">
-        {address ? (
-          <>
-            {hasAllowance ? (
-              <Button
-                onClick={
-                  swapType === "deposit" ? handleDeposit : handleWithdraw
-                }
-                isLoading={txLoading}
-              >
-                Confirm
-              </Button>
-            ) : (
-              <Button onClick={handleApproveAllowance} isLoading={txLoading}>
-                Approve token
-              </Button>
-            )}
-          </>
-        ) : (
-          <ConnectButton.Custom>
-            {({ openConnectModal }) => (
-              <Button onClick={() => openConnectModal()}>Connect Wallet</Button>
-            )}
-          </ConnectButton.Custom>
-        )}
-      </div>
+            <div>
+              <Typography variant="headlineH5">
+                {positionValue} <span className="text-sm">USDC</span>
+              </Typography>
+            </div>
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
@@ -290,7 +374,6 @@ const TokenInput = ({
   disabled?: boolean;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }) => {
-  console.log(balance);
   return (
     <div className={classNames("p-6 w-full dark:text-white", className)}>
       {label && <div className="mb-2">{label}</div>}
@@ -309,8 +392,10 @@ const TokenInput = ({
             onChange={onChange}
           />
         )}
-        {balance?.balance && (
-          <div>{utils.formatUnits(balance.balance, token?.decimals || 18)}</div>
+        {balance && (
+          <div>
+            {utils.formatUnits(balance?.balance || 0, token?.decimals || 18)}
+          </div>
         )}
         {token && <Typography variant="bodyXXL">{token.symbol}</Typography>}
       </div>
