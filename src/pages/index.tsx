@@ -15,13 +15,13 @@ export default function Home() {
 
       <div className="grid grid-cols-[auto_350px] gap-6">
         <div className="flex gap-4 w-full flex-col">
-          <Card>
+          {/* <Card>
             <Typography variant="headlineH6">Performance</Typography>
 
             <div className="pt-6">
               <PerformanceChart />
             </div>
-          </Card>
+          </Card> */}
 
           <Card>
             <Typography variant="headlineH6">Allocation</Typography>

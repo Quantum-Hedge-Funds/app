@@ -198,38 +198,42 @@ const SwapForm = () => {
 
   useEffect(() => {
     (async () => {
-      const totalSupply = await getSupply(vaultShareToken.address, signer);
+      try {
+        const totalSupply = await getSupply(vaultShareToken.address, signer);
 
-      const totalV = Number(totalValue) || 1;
-      const totalS = Number(totalSupply) || 1;
+        const totalV = Number(totalValue) || 1;
+        const totalS = Number(totalSupply) || 1;
 
-      if (+sellAmount > 0) {
-        const sell =
-          ((sellAmount || 0) as number) * 10 ** vaultShareToken.decimals;
+        if (+sellAmount > 0) {
+          const sell =
+            ((sellAmount || 0) as number) * 10 ** vaultShareToken.decimals;
 
-        const calculatedWithdrawAmount = (sell * totalV) / totalS;
+          const calculatedWithdrawAmount = (sell * totalV) / totalS;
 
-        setBuyWithdrawAmount(
-          utils.formatUnits(calculatedWithdrawAmount, stableToken.decimals)
-        );
-      } else {
-        setBuyWithdrawAmount("");
+          setBuyWithdrawAmount(
+            utils.formatUnits(calculatedWithdrawAmount, stableToken.decimals)
+          );
+        } else {
+          setBuyWithdrawAmount("");
+        }
+
+        // if (Number(vaultShareBalance?.balance || 0) == 0) {
+        //   return setPositionValue("");
+        // }
+
+        // const vaultB = Number(vaultShareBalance.balance || 0);
+
+        // const calculatedPoitionValue = (vaultB * totalV) / totalS;
+
+        // const totalPositionValue = utils.formatUnits(
+        //   calculatedPoitionValue,
+        //   stableToken.decimals
+        // );
+
+        // setPositionValue(totalPositionValue);
+      } catch (err) {
+        console.error(err);
       }
-
-      if (Number(vaultShareBalance?.balance || 0) == 0) {
-        return setPositionValue("");
-      }
-
-      const vaultB = Number(vaultShareBalance.balance || 0);
-
-      const calculatedPoitionValue = (vaultB * totalV) / totalS;
-
-      const totalPositionValue = utils.formatUnits(
-        calculatedPoitionValue,
-        stableToken.decimals
-      );
-
-      setPositionValue(totalPositionValue);
     })();
   }, [signer, sellAmount, totalValue, vaultShareBalance, stableBalance]);
 
@@ -303,7 +307,7 @@ const SwapForm = () => {
           )}
         </div>
       </div>
-
+      {/* 
       {(vaultShareBalance?.balance || 0) > 0 && (
         <Card>
           <Typography variant="headlineH6">Position</Typography>
@@ -329,7 +333,7 @@ const SwapForm = () => {
             </div>
           </div>
         </Card>
-      )}
+      )} */}
     </div>
   );
 };

@@ -15,7 +15,7 @@ import fundManagerAbi from "../constants/fundManagerAbi.json";
 
 import Spinner from "./Spinner";
 import { fetchBalance } from "wagmi/actions";
-import { useHydrated } from "@/hooks";
+import { useGetAllocation, useHydrated } from "@/hooks";
 
 const AllocationChart = () => {
   const [allocations, setAllocations] = useState<
@@ -24,14 +24,31 @@ const AllocationChart = () => {
 
   const { hasHydrated } = useHydrated();
 
-  const totalWeights = useContractRead({
-    address: process.env
-      .NEXT_PUBLIC_FUND_MANAGER_CONTRACT_ADDRESS! as `0x${string}`,
-    abi: fundManagerAbi,
-    functionName: "totalWeights",
-  });
+  // const token1 = useContractRead({
+  //   address: process.env
+  //     .NEXT_PUBLIC_FUND_MANAGER_CONTRACT_ADDRESS! as `0x${string}`,
+  //   abi: fundManagerAbi,
+  //   functionName: "weights",
+  //   args: [0],
+  // });
+  // const token2 = useContractRead({
+  //   address: process.env
+  //     .NEXT_PUBLIC_FUND_MANAGER_CONTRACT_ADDRESS! as `0x${string}`,
+  //   abi: fundManagerAbi,
+  //   functionName: "weights",
+  //   args: [0],
+  // });
+  // const token3 = useContractRead({
+  //   address: process.env
+  //     .NEXT_PUBLIC_FUND_MANAGER_CONTRACT_ADDRESS! as `0x${string}`,
+  //   abi: fundManagerAbi,
+  //   functionName: "weights",
+  //   args: [0],
+  // });
 
-  console.log(totalWeights.data);
+  // console.log(token1.data, token2.data, token3.data);
+
+  const allocation = useGetAllocation();
 
   const totalValue = useContractRead({
     address: process.env.NEXT_PUBLIC_VAULT_CONTRACT_ADDRESS! as `0x${string}`,
