@@ -81,7 +81,6 @@ const AllocationChart = () => {
       { name: "ETH", allocation: 20 },
       { name: "DOGE", allocation: 10 },
       { name: "SOL", allocation: 15 },
-      { name: "BNB", allocation: 25 },
     ];
 
     setAllocations(data);
@@ -107,7 +106,7 @@ const AllocationChart = () => {
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={allocations}>
         <XAxis dataKey="name" />
-        <YAxis domain={[0, 100]} />
+        <YAxis />
         <Tooltip
           labelStyle={{
             color: "black",
